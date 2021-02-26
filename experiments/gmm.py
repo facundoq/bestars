@@ -1,6 +1,6 @@
 from sklearn.metrics import classification_report,f1_score,precision_recall_curve,precision_score
 from sklearn.mixture import GaussianMixture
-from facu import preprocess
+from experiments import preprocess
 import numpy as np
 import matplotlib.pyplot as plt
 

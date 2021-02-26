@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn import svm
 from sklearn.metrics import classification_report
-from facu import preprocess
+from experiments import preprocess
 import numpy as np
 x,y,class_names,id=preprocess.load_data(binary=True)
 

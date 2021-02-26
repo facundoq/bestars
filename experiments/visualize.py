@@ -1,5 +1,5 @@
 
-from facu import preprocess
+from experiments import preprocess
 import numpy as np
 data,class_names=preprocess.load_data()
 x,y,id = data
