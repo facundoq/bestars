@@ -13,7 +13,6 @@ def q3(v1:np.ndarray,v2:np.ndarray,v3:np.ndarray,r1:float,r2:float,r3:float):
 
 def q4(v1:np.ndarray,v2:np.ndarray,v3:np.ndarray,v4:np.ndarray,r1:float,r2:float,r3:float,r4:float):
     coef = (r1-r2)/(r3-r4)
-    print(r1,r2,r3,r4,coef)
     return q4_coef(v1,v2,v3,v4,coef)
 
 def calculate_q(magnitudes:np.ndarray,coefficients:np.ndarray,names:[str]=None,combinations=3):
