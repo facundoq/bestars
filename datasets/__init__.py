@@ -35,6 +35,7 @@ def common_columns(datasets:[str]):
 #
 #     return (x,y,id),class_names
 
+
 def load_liu(filename=None,dropna=True):
 
     if filename is None:
@@ -66,7 +67,7 @@ def load_liu(filename=None,dropna=True):
 def load_mohr(filename=None,binary=False,dropna=True):
     # load mohr-smith datsaet
     if filename is None:
-        filename = "Mohr-Smith_2017_Completa_VPHAS-2MASS-ALLWISE_OK.csv"
+        filename = "Mohr-Smith_2017.csv"
         #filename = "Mohr-Smith_2017_Completa.csv"
 
     folderpath =Path(__file__).parent.absolute()
@@ -78,8 +79,9 @@ def load_mohr(filename=None,binary=False,dropna=True):
     y_columns = ["goodOB","EM","SUB","LUM"]
     y = df[y_columns]
     x_columns = [ 'umag', 'gmag', 'rmag',
-                  'imag', 'Hamag', 'Jmag', 'Hmag', 'Kmag', 'W1mag', 'W2mag', 'W3mag',
-                  'W4mag',]
+                  'imag', 'Hamag', 'Jmag', 'Hmag', 'Kmag',
+                  # 'W1mag', 'W2mag', 'W3mag','W4mag',
+                  ]
     x = df[x_columns]
     metadata_columns = set(df.columns).difference(set(x_columns).union(set(y_columns)))
     # metadata_columns  = ["VPHAS-OB1","RAJ2000","DEJ2000",  'logTeff', 'A0', 'Rv', 'mu',
