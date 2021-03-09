@@ -1,1 +1,1 @@
-from .qfeatures import calculate_q
+from .qfeatures import calculate
