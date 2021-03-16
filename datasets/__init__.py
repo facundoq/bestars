@@ -1,15 +1,15 @@
 
 from . import liu,mohr_smith,mcswain,hou
+from .base import map_y_em
+
+dataset_names = {"liu":liu,
+                 "mohr_smith":mohr_smith,
+                 "mcswain": mcswain,
+                 "hou":hou}
 
 
-def common_columns(datasets:[str]):
-    def lequal(l1,l2):
-        l1=list(sorted((l1)))
-        return len(l1) == len(l2) and sorted(l1)==sorted(l2)
+from . import all_em
 
-    if lequal(datasets,["liu2017","mohr"]):
-        return [ 'umag', 'gmag', 'rmag',
-                 'imag', 'Hamag', 'Jmag', 'Hmag', 'Kmag',
-                 ]
-    else:
-        raise ValueError(f"No entries  for dataset combination: {datasets}")
+# add it afterwards to avoid recursion
+dataset_names["all_em"] = all_em
+

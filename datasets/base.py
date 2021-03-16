@@ -62,3 +62,27 @@ def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool):
             print(f"Rows (after drop): {new_n}")
 
     return x,y,metadata
+
+
+def map_y_em(y:pd.DataFrame,dataset_name:str):
+    n = len(y)
+    name="em"
+    columns=[name]
+    if dataset_name=="liu":
+        y = pd.DataFrame(y["Halpha"].to_numpy(),columns=columns)
+    elif dataset_name=="hou":
+        y = pd.DataFrame(np.ones(n),columns=columns)
+    elif dataset_name=="mohr_smith":
+        y = pd.DataFrame(y["EM"].to_numpy(),columns=columns)
+    elif dataset_name=="mcswain":
+        indices = y["Code"].to_numpy()=="Be"
+        indices = indices.astype(int)
+        y = pd.DataFrame(indices,columns=columns)
+    elif dataset_name == "all_em":
+        return y
+    else:
+        raise ValueError(f"Unsupported dataset '{dataset_name}'")
+    assert np.logical_or(y[name].to_numpy()==1,y[name].to_numpy()==0).all()
+
+
+    return y

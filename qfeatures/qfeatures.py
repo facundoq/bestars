@@ -31,10 +31,10 @@ class Magnitudes:
         self.systems=systems
 
     def split_by_system(self):
-        unique_systems = list(set(systems))
+        unique_systems = list(set(self.systems))
         magnitudes=[]
         for system in unique_systems:
-            system_indices = [i for i, v in enumerate(systems) if v == system]
+            system_indices = [i for i, v in enumerate(self.systems) if v == system]
             system_magnitudes = self.magnitudes[:, system_indices]
             system_coefficients = self.coefficients[system_indices]
             system_column_names = [self.column_names[i] for i in system_indices]
