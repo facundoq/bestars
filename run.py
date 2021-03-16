@@ -15,7 +15,7 @@ class DatasetClassDistribution(Experiment):
         return "Plot histograms of distribution of classes for each dataset"
 
     def run(self):
-        names = datasets.dataset_names_all
+        names = datasets.datasets_by_name_all
         n_datasets = len(names)
         f,axes=plt.subplots(1,n_datasets,sharey=True,sharex=True)
         for i,(name,dataset_module) in enumerate(names.items()):
@@ -31,9 +31,18 @@ class DatasetClassDistribution(Experiment):
 
 
 class CrossDatasetAccuracy(Experiment):
-
+    def description(self) -> str:
+        return "Evaluate several training/testing dataset combinations."
     def run(self):
-        pass
+
+        testing_datasets = ["liu"]
+        # TODO all but testing
+        training_datasets = ["mohr_smith","hou","mcswain"]
+
+        x_train,y_train,metadata_train = datasets.all_em.load(dataset_names=training_datasets)
+        x_test,y_test,metadata_train = datasets.all_em.load(dataset_names=testing_datasets)
+        print(x_train.shape,x_test.shape)
+        # TODO train/test with various classifiers
 
 
 
@@ -42,7 +51,7 @@ class CrossDatasetAccuracy(Experiment):
 
 if __name__ == '__main__':
 
-    experiments = [#CrossDatasetAccuracy(),
+    experiments = [CrossDatasetAccuracy(),
                    DatasetClassDistribution(),
 
                    ]

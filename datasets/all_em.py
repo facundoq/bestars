@@ -1,15 +1,17 @@
 import pandas as pd
-from . import dataset_names
+from . import datasets_by_name
 from . import base
 
 coefficients=base.coefficients
 systems=base.systems
 
-def load(dropna=True):
+def load(dropna=True, dataset_names=datasets_by_name.keys(),exclude=[],verbose=False):
     x_all,y_all=pd.DataFrame(),pd.DataFrame()
     m=pd.DataFrame()
     for name in dataset_names:
-        x,y,_ = dataset_names[name].load(dropna=dropna)
+        if name in exclude:
+            continue
+        x,y,_ = datasets_by_name[name].load(dropna=dropna,verbose=verbose)
         y = base.map_y_em(y,name)
         x_all=x_all.append(x)
         y_all=y_all.append(y)

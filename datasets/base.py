@@ -32,7 +32,7 @@ systems =        {'umag': 'VPHAS',
                   }
 
 
-def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool):
+def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False):
 
     folderpath =Path(__file__).parent.absolute()
     filepath = folderpath / filename
@@ -56,7 +56,7 @@ def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool):
 
         new_n=len(x)
 
-        if new_n<n:
+        if new_n<n and verbose:
             print(f"Warning: dropped {n-new_n} rows with incomplete values. ")
             print(f"Rows (original):   {n}")
             print(f"Rows (after drop): {new_n}")
