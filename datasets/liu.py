@@ -15,8 +15,8 @@ from . import base
 coefficients = base.coefficients
 systems = base.systems
 
-default_filename = "CANDIDATES-Halfa_COMPLETA_Liu2019_LAMOST_OBstars-IPHAS-SDSS-2MASS_short_2.csv"
+default_filename = "Liu2019_LAMOST_OBstars-IPHAS-SDSS-2MASS_subset.csv"
 
 def load(filename=default_filename,dropna=True):
-    y_columns = ["H_alpha"]
+    y_columns = ["Halpha"]
     return base.load(filename,base.twomass_x_columns,y_columns,dropna)
