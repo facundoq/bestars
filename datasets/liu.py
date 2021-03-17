@@ -1,10 +1,7 @@
-import numpy as np
-from sklearn.model_selection import train_test_split
-from pathlib import Path
-import pandas as pd
+
 from . import base
 
-# This codes loads a labelled subset of the Liu 2019 dataset containing photometric data of
+# Loads a labelled subset of the Liu 2019 dataset containing photometric data of
 # Be stars and other types of OB stars
 # More info at:
 # A Catalogue of OB Stars from LAMOST Spectroscopic Survey

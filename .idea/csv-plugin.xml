@@ -3,6 +3,20 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/datasets/Hou2016_VPHAS-SDSS-IPHAS-2MASS.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/datasets/Liu2019_LAMOST_OBstars-IPHAS-SDSS-2MASS_subset.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/datasets/Mohr-Smith_2017_Completa.csv">
           <value>
             <Attribute>
@@ -11,6 +25,41 @@
           </value>
         </entry>
         <entry key="/datasets/Mohr-Smith_2017_Completa_VPHAS-2MASS-ALLWISE_OK.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/datasets/old/Liu2019_Etiquetados_IPHAS-SDSS-2MASS-AllWISE_OK.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/datasets/old/Liu2019_LAMOST_OBstars-IPHAS-SDSS-2MASS_short.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/datasets/old/Liu2019_LAMOST_OBstars-VPHAS-2MASS_short.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/experiments/gmm_candidates.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/old/ob_features.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
