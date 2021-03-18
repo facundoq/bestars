@@ -33,7 +33,6 @@ systems =        {'umag': 'VPHAS',
 
 
 def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False):
-
     folderpath =Path(__file__).parent.absolute()
     filepath = folderpath / filename
     df = pd.read_csv(filepath)
@@ -57,10 +56,13 @@ def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False)
         new_n=len(x)
 
         if new_n<n and verbose:
-            print(f"Warning: dropped {n-new_n} rows with incomplete values. ")
+            print(f"Warning loading data from {filename}:")
+            print(f"Dropped {n-new_n} rows with missing values. ")
             print(f"Rows (original):   {n}")
             print(f"Rows (after drop): {new_n}")
-
+        x=x.reset_index(drop=True)
+        y=y.reset_index(drop=True)
+        metadata=metadata.reset_index(drop=True)
     return x,y,metadata
 
 

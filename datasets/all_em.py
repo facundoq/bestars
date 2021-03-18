@@ -16,4 +16,6 @@ def load(dropna=True, dataset_names=datasets_by_name.keys(),exclude=[],verbose=F
         x_all=x_all.append(x)
         y_all=y_all.append(y)
 
+    x_all=x_all.reset_index(drop=True)
+    y_all=y_all.reset_index(drop=True)
     return x_all,y_all,m
