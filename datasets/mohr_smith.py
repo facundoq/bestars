@@ -1,6 +1,6 @@
 from . import base
 
-# This codes loads a labelled subset of the Mohr-Smith 2017 dataset containing photometric data of
+# Loads a labelled subset of the Mohr-Smith 2017 dataset containing photometric data of
 # Be stars and other types of OB stars
 # More info at:
 # VizieR Online Data Catalog: New OB star candidates in Carina Arm (Mohr-Smith+, 2015):
