@@ -11,5 +11,5 @@ class CrossDatasetAccuracy(Experiment):
 
         x_train,y_train,metadata_train = datasets.all_em.load(dataset_names=training_datasets)
         x_test,y_test,metadata_train = datasets.all_em.load(dataset_names=testing_datasets)
-        print(x_train.shape,x_test.shape)
+        #print(x_train.shape,x_test.shape)
         # TODO train/test with various classifiers
