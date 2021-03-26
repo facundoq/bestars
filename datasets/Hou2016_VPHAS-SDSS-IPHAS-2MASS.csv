@@ -1,4 +1,4 @@
-ID,_RA2000,_DEC2000,w1,w1_err,h,h_err,k,k_err,Halpha_type,objtype_Hou,objtype_SIMBAD,Fe_type,umag,e_umag,gmag,e_gmag,Hamag,e_Hamag,rmag,e_rmag,imag,e_imag,Jmag,Hmag,Kmag,e_Jmag,e_Hmag,e_Kmag
+ID,RAJ2000,DEJ2000,w1,w1_err,h,h_err,k,k_err,Halpha_type,objtype_Hou,objtype_SIMBAD,Fe_type,umag,e_umag,gmag,e_gmag,Hamag,e_Hamag,rmag,e_rmag,imag,e_imag,Jmag,Hmag,Kmag,e_Jmag,e_Hmag,e_Kmag
 J063416.35+023030.2,98.568135,2.5083942,11.916,0.054,12.072,0.024,12.003,0.027,I,CBe,,,14.68,0.01,14.28,0.0,13.33,0.0,13.47,0.0,12.99,0.01,12.347,12.072,12.003,0.023,0.024,0.027
 J063432.90+015513.7,98.637124,1.9204795,9.898,0.023,10.448,0.026,10.132,0.024,I,CBe,,,,,,,,,13.69,0.0,12.88,0.0,11.247,10.448,10.132,0.027,0.026,0.024
 J063432.90+015513.7,98.637124,1.9204795,9.898,0.023,10.448,0.026,10.132,0.024,I,CBe,,,,,,,,,13.69,0.0,12.88,0.0,11.247,10.448,10.132,0.027,0.026,0.024

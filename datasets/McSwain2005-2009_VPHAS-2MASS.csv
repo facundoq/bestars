@@ -1,4 +1,4 @@
-_RAJ2000,_DEJ2000,Cluster,MG,ymag,e_ymag,b-y,e_b-y,y-Ha,e_y-Ha,WHa05,WHa06,WHa07,vsini,e_vsini,Teff,e_Teff,logg,e_logg,loggP,Mass,e_Mass,Rad,e_Rad,Vc,SB?,Code,clean,umag,e_umag,gmag,e_gmag,Hamag,e_Hamag,rmag,e_rmag,imag,e_imag,Jmag,Hmag,Kmag,e_Jmag,e_Hmag,e_Kmag
+RAJ2000,DEJ2000,Cluster,MG,ymag,e_ymag,b-y,e_b-y,y-Ha,e_y-Ha,WHa05,WHa06,WHa07,vsini,e_vsini,Teff,e_Teff,logg,e_logg,loggP,Mass,e_Mass,Rad,e_Rad,Vc,SB?,Code,clean,umag,e_umag,gmag,e_gmag,Hamag,e_Hamag,rmag,e_rmag,imag,e_imag,Jmag,Hmag,Kmag,e_Jmag,e_Hmag,e_Kmag
 106.7981667,-10.62075,NGC 2343,46,15.254,0.089,0.459,0.113,0.644,0.128,,,,,,,,,,,,,,,,,O,false,16.24,0.01,,,14.64,0.01,,,,,13.517,13.183,13.021,0.029,0.037,0.039
 106.8293333,-10.5761944,NGC 2343,22,13.345,0.044,0.493,0.059,0.69,0.064,,,,,,,,,,,,,,,,,O,true,14.15,0.0,13.82,0.0,12.66,0.0,12.93,0.0,12.51,0.01,11.862,11.461,11.378,0.024,0.021,0.023
 106.8583333,-10.55425,NGC 2343,8,11.793,0.027,0.106,0.035,0.086,0.046,,,,,,,,,,,,,,,,,O,false,,,,,11.6,0.0,,,,,11.427,11.391,11.395,0.023,0.024,0.024

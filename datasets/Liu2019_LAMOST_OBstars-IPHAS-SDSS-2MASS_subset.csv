@@ -1,4 +1,4 @@
-col1,Unnamed: 0,_RAJ2000_1,_DEJ2000_1,LAMOST_sep,umag,gmag,rmag,Hamag,imag,Jmag,Hmag,Kmag,original_index,model_prob,Halpha
+col1,Unnamed: 0,RAJ2000,DEJ2000,LAMOST_sep,umag,gmag,rmag,Hamag,imag,Jmag,Hmag,Kmag,original_index,model_prob,Halpha
 545,546,64.4589390,53.4239310,2.00,14.41,14.29,13.33,12.54,12.74,11.81,11.48,11.19,545.00,1.00,1.00
 397,398,64.4589367,53.4239286,2.00,14.41,14.29,13.33,12.54,12.74,11.81,11.48,11.19,397.00,1.00,1.00
 555,556,62.8359500,53.2345390,2.00,14.06,14.00,12.83,12.10,12.34,11.79,11.51,11.25,555.00,1.00,1.00
