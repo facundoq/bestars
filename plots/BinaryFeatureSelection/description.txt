@@ -1,1 +1,1 @@
-Plot histograms of distribution of classes for each dataset
+Select pairs of features that are good for classifying EM vs no EM objects.
