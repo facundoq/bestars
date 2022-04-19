@@ -5,6 +5,7 @@ import abc
 import datasets
 import sys
 from pathlib import Path
+
 current=Path(__file__)
 
 plots_folder = current.parent / "../plots/"
@@ -71,3 +72,6 @@ class Experiment(abc.ABC):
         dt_string = dt.strftime(strf_format)
         message = f"[{dt_string}] *** {message}"
         print(message)
+
+    
+

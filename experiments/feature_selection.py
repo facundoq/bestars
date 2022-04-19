@@ -96,7 +96,7 @@ class BinaryFeatureSelection(Experiment):
         scaler = sklearn.preprocessing.StandardScaler().fit(x_train)
         x_train=scaler.transform(x_train)
         x_test = scaler.transform(x_test)
-        clf = MLPClassifier(solver='adam', alpha=1e-3, hidden_layer_sizes = (6, 3), random_state = 1,max_iter=1000f)
+        clf = MLPClassifier(solver='adam', alpha=1e-3, hidden_layer_sizes = (6, 3), random_state = 1,max_iter=1000  )
         clf.fit(x_train,y_train)
         y_test_pred = clf.predict(x_test)
         return sklearn.metrics.f1_score(y_test,y_test_pred)

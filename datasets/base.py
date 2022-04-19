@@ -1,4 +1,5 @@
 
+from typing import List
 import numpy as np
 from pathlib import Path
 import pandas as pd
@@ -31,11 +32,13 @@ systems =        {'umag': 'VPHAS',
                   'W2mag':'WISE',
                   }
 
+def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],dropna:bool,verbose=False,dtypes={},fill_values=None,):
+    if not fill_values is None:
+        for column,value in fill_values.items():
+            if verbose:
+                print(f"Warning: Filling missing values for {column} with {value}")
+            df[column] = df[column].fillna(value)
 
-def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False):
-    folderpath =Path(__file__).parent.absolute()
-    filepath = folderpath / filename
-    df = pd.read_csv(filepath)
     y = df[y_columns].copy()
     x = df[x_columns].copy()
 
@@ -46,9 +49,9 @@ def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False)
         n = len(x)
 
         nan_indices_x = np.where(pd.isnull(x).any(axis=1))
-        nan_indices_y = np.where(pd.isnull(x).any(axis=1))
+        nan_indices_y = np.where(pd.isnull(y).any(axis=1))
         nan_indices = np.union1d(nan_indices_x,nan_indices_y)
-
+        
         x.drop(nan_indices,inplace=True)
         y.drop(nan_indices,inplace=True)
         metadata.drop(nan_indices,inplace=True)
@@ -65,6 +68,13 @@ def load(filename:str,x_columns:[str],y_columns:[str],dropna:bool,verbose=False)
         metadata=metadata.reset_index(drop=True)
     return x,y,metadata
 
+def load(filename:str,x_columns:List[str],y_columns:List[str],dropna:bool,verbose=False,dtypes={},fill_values=None):
+    folderpath =Path(__file__).parent.absolute()
+    filepath = folderpath / filename
+    df = pd.read_csv(filepath,dtype=dtypes)
+    return preprocess(df,filename,x_columns,y_columns,dropna,verbose=verbose,dtypes=dtypes,fill_values=fill_values)
+    
+
 
 def map_y_em(y:pd.DataFrame,dataset_name:str):
     n = len(y)
@@ -80,8 +90,10 @@ def map_y_em(y:pd.DataFrame,dataset_name:str):
         indices = y["Code"].to_numpy()=="Be"
         indices = indices.astype(int)
         y = pd.DataFrame(indices,columns=columns)
+    elif dataset_name == "aidelman":
+        y = pd.DataFrame(y["EM"].to_numpy(),columns=columns)
     elif dataset_name == "all_em":
-        return y
+        return y    
     else:
         raise ValueError(f"Unsupported dataset '{dataset_name}'")
     assert np.logical_or(y[name].to_numpy()==1,y[name].to_numpy()==0).all()

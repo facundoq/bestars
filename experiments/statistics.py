@@ -34,7 +34,6 @@ class DatasetClassDistribution(Experiment):
             x,y,metadata = dataset_module.load()
             ax = axes[i]
             if len(y.columns)==1:
-                print(y)
                 y.plot.bar(ax=ax)
                 ax.set_xlabel(name)
                 if i==0:
@@ -81,7 +80,7 @@ class OutlierDetection(Experiment):
             x,y,metadata = dataset_module.load(dropna=True)
             outliers,outlier_indices = self.run_inner(x, y, metadata, name)
             outliers.to_csv(self.plot_folderpath / f"{name}.csv")
-
+            
             coefficients = dataset_module.coefficients
             systems = dataset_module.systems
             coefficients_np = np.array([coefficients[k] for k in x.columns])
@@ -102,25 +101,21 @@ class OutlierDetectionTukey(OutlierDetection):
     def description(self) -> str:
         return "Detect outliers in each dataset using IQR based statistics"
     def detect_outliers(self,x:pd.DataFrame):
-        iqr_factor = 1.5
-        q25, q75 = x.quantile(0.25), x.quantile(0.75)
-        iqr = q75 - q25
-        min_values = q25 - iqr_factor * iqr
-        max_values = q75 + iqr_factor * iqr
-        # ou
-        outliers = np.logical_or(x < min_values, x > max_values)
-        return outliers
+        out = outliers.detect_outliers_iqr(x,iqr_factor=3)
+        return pd.DataFrame(out)
 
 
 class OutlierDetectionNormalConfidenceInterval(OutlierDetection):
     def description(self) -> str:
-        return "Detect outliers in each dataset using IQR based statistics"
+        return "Detect outliers in each dataset using a Confidence interval based statistics"
 
     def detect_outliers(self,x:pd.DataFrame):
-        m = len(x.columns)  # number of columns = number of hypothesis
-        confidence = 0.99
-        adjusted_confidence = 1 - (1 - confidence) / m  # bonferroni-adjusted confidence
-        max_zscore = stats.norm.ppf(adjusted_confidence)
+        # m = len(x.columns)  # number of columns = number of hypothesis
+        # confidence = 0.99
+        # adjusted_confidence = 1 - (1 - confidence) / m  # bonferroni-adjusted confidence
+        # max_zscore = stats.norm.ppf(adjusted_confidence)
 
-        outliers = np.abs(stats.zscore(x - x.mean())) > max_zscore
-        return pd.DataFrame(outliers,columns=x.columns)
+        # outliers = np.abs(stats.zscore(x - x.mean())) > max_zscore
+        # return pd.DataFrame(outliers,columns=x.columns)
+        out = outliers.detect_outliers_confidence_interval(x,confidence=0.999)
+        return pd.DataFrame(out)
