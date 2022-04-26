@@ -1,6 +1,6 @@
 
 from . import liu,mohr_smith,mcswain,hou,aidelman
-from .base import map_y_em
+from .base import map_y_em,map_y_be
 
 datasets_by_name_small =  {"liu":liu,
                  "mohr_smith":mohr_smith,

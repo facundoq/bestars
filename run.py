@@ -3,7 +3,7 @@
 from experiments.cross_dataset import CrossDatasetAccuracy
 from experiments.feature_selection import BinaryFeatureSelection
 from experiments.statistics import DatasetClassDistributionEM,DatasetClassDistribution,OutlierDetectionTukey,OutlierDetectionNormalConfidenceInterval
-from experiments.evaluate import SKLearnClassifiers
+from experiments.evaluate import EvaluateClassifiers
 
 # jupyter nbconvert --to pdf --execute "Exploratory analysis.ipynb" --output "all_em.pdf"
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
                     #BinaryFeatureSelection(),
                 #    OutlierDetectionTukey(),
                 #    OutlierDetectionNormalConfidenceInterval(),
-                   SKLearnClassifiers()
+                   EvaluateClassifiers()
 
                    ]
 

@@ -42,7 +42,7 @@ def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],
     y = df[y_columns].copy()
     x = df[x_columns].copy()
 
-    metadata_columns = set(df.columns).difference(set(x_columns).union(set(y_columns)))
+    metadata_columns = list(set(df.columns).difference(set(x_columns).union(set(y_columns))))
     metadata = df[metadata_columns].copy()
 
     if dropna:
@@ -75,6 +75,18 @@ def load(filename:str,x_columns:List[str],y_columns:List[str],dropna:bool,verbos
     return preprocess(df,filename,x_columns,y_columns,dropna,verbose=verbose,dtypes=dtypes,fill_values=fill_values)
     
 
+def map_y_be(y:pd.DataFrame,dataset_name:str):
+    n = len(y)
+    name="be"
+    columns=[name]
+    if dataset_name == "aidelman":
+        y = pd.DataFrame(y["Be"].to_numpy(),columns=columns)
+    else:
+        raise ValueError(f"Unsupported dataset '{dataset_name}'")
+    assert np.logical_or(y[name].to_numpy()==1,y[name].to_numpy()==0).all()
+
+
+    return y
 
 def map_y_em(y:pd.DataFrame,dataset_name:str):
     n = len(y)

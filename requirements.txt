@@ -4,3 +4,4 @@ matplotlib
 jupyter
 seaborn
 numpy
+tensorflow
