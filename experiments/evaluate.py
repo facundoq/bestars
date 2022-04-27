@@ -33,7 +33,7 @@ class ClassifierExperiment(StarExperiment):
         x_np = x.to_numpy()
         return x_np,y_np,metadata
 
-    def plot(self,dataset_name,class_feature_name,train_scores,test_scores,x_label,x_values):
+    def plot_scores(self,dataset_name,class_feature_name,train_scores,test_scores,x_label,x_values):
         subsets = ["train","test"]
         for i,scores in enumerate([train_scores,test_scores]):
             subset = subsets[i]
@@ -122,19 +122,21 @@ class EvaluateClassifiers(ClassifierExperiment):
         # models = {"mlp":self.mlp,"rf":self.rf,"gbc":self.gbc}
         model_generators = [NeuralNetwork, RandomForest,GradientBoosting,MLP]
         class_features = ["em","be"]
-        model_names = [model.__class__.__name__ for model in model_generators]
+        
         features_ids = [None,"q3","q4"]
         for dataset_name, class_feature_name, feature_id in  product(dataset_names,class_features,features_ids):
             x,y,metadata = self.load_dataset(dataset_name,feature_id,class_feature_name)
             train_scores_models = {"fscore":[],"precision":[],"recall":[]}
             test_scores_models =  {"fscore":[],"precision":[],"recall":[]}
+            model_names = []
             for model_generator in model_generators:
                 model = model_generator(x.shape[1:])
+                model_names.append(model.__class__.name)
                 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=0.20, random_state=0, stratify=y)
                 train_scores,test_scores = self.train_evaluate(model,x_train, x_test,y_train, y_test)
                 append_all(train_scores,train_scores_models)
                 append_all(test_scores,test_scores_models)                
-            self.plot(dataset_name,class_feature_name,train_scores_models,test_scores_models,"Model",model_names)
+            self.plot_scores(dataset_name,class_feature_name,train_scores_models,test_scores_models,"Model",model_names)
             
 
         
@@ -158,10 +160,12 @@ class DetermineMinimumTrainingSet(ClassifierExperiment):
             x,y,metadata = self.load_dataset(dataset_name,feature_id,class_feature_name)
             train_scores_models = {"fscore":[],"precision":[],"recall":[]}
             test_scores_models =  {"fscore":[],"precision":[],"recall":[]}
+            
             for training_set_sizes in training_set_sizes:
                 model = model_generator(x.shape[1:])
+                model_name = model.__class__.name
                 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=1-training_set_sizes, random_state=0, stratify=y)
                 train_scores,test_scores = self.train_evaluate(model,x_train, x_test,y_train, y_test)
                 append_all(train_scores,train_scores_models)
                 append_all(test_scores,test_scores_models)                
-            self.plot(dataset_name,class_feature_name,train_scores_models,test_scores_models,"Training set %",training_set_sizes)
+            self.plot_scores(dataset_name,class_feature_name,train_scores_models,test_scores_models,"Training set %",training_set_sizes)
