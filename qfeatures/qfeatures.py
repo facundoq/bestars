@@ -1,13 +1,45 @@
 from __future__ import annotations
+from typing import Dict, List
 import numpy as np
 import itertools
+
+
+def q_row(c:np.ndarray,indices:np.ndarray):
+    row = np.array(len(coefficients))
+    if n==3:
+        i,j,k=indices
+        r =  (c[i]-c[j])/(c[j]-c[k])
+        row[i]=1
+        row[j]=-1-r
+        row[k]=r
+    elif n==4:
+        i,j,k,l=indices
+        r =  (c[i]-c[j])/(c[k]-c[l])
+        row[i]=1
+        row[j]=-1-r
+        row[k]=r
+        row[l]=r
+    else:
+        raise ValueError(f"Wrong number of indices, expected 3 or 4, received {n}.")
+    return row
+
+def q_matrix(coefficients:np.ndarray,permutations:False,q=3):
+    assert q==3 or q==4, "The order of q must be 3 or 4"
+    n = len(coefficients)
+   
+    combinations = itertools.permutations(n,q) if permutations else itertools.combinations(n,q)
+    combinations = list(combinations)
+    q = np.zeros((len(combinations),n))
+    for i,combination in enumerate(combinations):
+        q[i,:]=q_row(coefficients,combination)
+    return q,combinations
 
 
 
 
 class Magnitudes:
     @staticmethod
-    def merge(ms:[Magnitudes]):
+    def merge(ms:List[Magnitudes]):
         magnitudes = np.concatenate([m.magnitudes for m in ms],axis=1)
         coefficients = np.concatenate([m.coefficients for m in ms],axis=0)
         column_names = [name for m in ms for name in m.column_names]
@@ -15,7 +47,7 @@ class Magnitudes:
         return Magnitudes(magnitudes,coefficients,column_names,systems)
 
     @staticmethod
-    def check_dims(magnitudes: np.ndarray, coefficients: np.ndarray, column_names: [str], systems: [str]):
+    def check_dims(magnitudes: np.ndarray, coefficients: np.ndarray, column_names: List[str], systems: List[str]):
         n, n_cols = magnitudes.shape
         assert len(
             column_names) == n_cols, f"Length of names ({len(column_names)}) must match number of columns ({n_cols})"
@@ -23,7 +55,7 @@ class Magnitudes:
             coefficients) == n_cols, f"Length of coefficients {len(coefficients)} must match number of columns ({n_cols})"
         assert len(systems) == n_cols, f"Length of systems {len(systems)} must match number of columns ({n_cols})"
 
-    def __init__(self,magnitudes:np.ndarray, coefficients:np.ndarray, column_names:[str], systems:[str]):
+    def __init__(self,magnitudes:np.ndarray, coefficients:np.ndarray, column_names:List[str], systems:List[str]):
         Magnitudes.check_dims(magnitudes,coefficients,column_names,systems)
         self.magnitudes=magnitudes
         self.coefficients=coefficients
@@ -53,7 +85,7 @@ def q4_coef(v1:np.ndarray,v2:np.ndarray,v3:np.ndarray,v4:np.ndarray,coef:float):
     return v1 - v2 - coef * (v3 - v4)
 
 def q3(v1:np.ndarray,v2:np.ndarray,v3:np.ndarray,r1:float,r2:float,r3:float):
-    coef = (r1-r2)/r3
+    coef = (r1-r2)/(r2-r3)
     return q3_coef(v1,v2,v3,coef),coef
 
 def q4(v1:np.ndarray,v2:np.ndarray,v3:np.ndarray,v4:np.ndarray,r1:float,r2:float,r3:float,r4:float):
@@ -84,6 +116,7 @@ def calculate_q(m:Magnitudes,combination_size:int):
     n_qindices= len(index_combinations)
     q_magnitudes = np.zeros((n,n_qindices))
     q_coefficients = np.zeros(n_qindices)
+    
     for i,combination in enumerate(index_combinations):
         combination_magnitudes = [m.magnitudes[:,j] for j in combination]
         combination_coefficients = [m.coefficients[j] for j in combination]
@@ -91,7 +124,7 @@ def calculate_q(m:Magnitudes,combination_size:int):
 
     return Magnitudes(q_magnitudes,q_coefficients,q_names,q_systems)
 
-def calculate(magnitudes:np.ndarray, coefficients:np.ndarray, column_names:[str], systems:[str], combination_size=3,by_system=False):
+def calculate(magnitudes:np.ndarray, coefficients:np.ndarray, column_names:List[str], systems:List[str], combination_size=3,by_system=False):
     m = Magnitudes(magnitudes,coefficients,column_names,systems)
     if by_system:
         m_by_system=m.split_by_system()
@@ -99,9 +132,17 @@ def calculate(magnitudes:np.ndarray, coefficients:np.ndarray, column_names:[str]
         m_by_system=[m]
     q_by_system = [calculate_q(m, combination_size) for m in m_by_system]
     return Magnitudes.merge(q_by_system)
-
+import pandas as pd
+def calculate_df(magnitudes:pd.DataFrame,coefficients:Dict[str,float],systems:Dict[str,str],combination_size=3,by_system=False):
+    x = magnitudes.to_numpy()
+    column_names = magnitudes.columns.tolist()
+    coefficients = np.array([coefficients[k] for k in column_names])
+    systems = [systems[k] for k in column_names]
+    m = calculate(x,coefficients,column_names,systems,combination_size,by_system)
+    features = pd.DataFrame(data=m.magnitudes,columns=m.column_names)
+    return features
 #
-# def calculate_by_system(magnitudes:np.ndarray, coefficients:np.ndarray, column_names:[str], systems:[str],qfunction:Callable,combinations=3):
+# def calculate_by_system(magnitudes:np.ndarray, coefficients:np.ndarray, column_names:List[str], systems:List[str],qfunction:Callable,combinations=3):
 #     n, n_cols = magnitudes.shape
 #     column_indices = range(n_cols)
 #     unique_systems = list(set(systems))

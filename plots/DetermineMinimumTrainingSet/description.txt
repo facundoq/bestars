@@ -1,0 +1,1 @@
+Train classifiers with different training set sizes to determine the minimum number of samples to achieve a decent f-score

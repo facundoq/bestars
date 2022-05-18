@@ -9,7 +9,7 @@ default_filename = "data/Concatenadas_sinRepes_dropnan_LAMOST.csv"
 
 
 
-def load(filename=default_filename,dropna=True,verbose=False):
+def load(filename=default_filename,dropna_x=True,dropna_y=False,fillna_classes=True,verbose=False,fill_values=None):
    y_columns = ["Be","EM"]
    str_cols = ['ID', 'SpT', 'Type',  'obsid', 'objtype', 'class', 'subclass', 
     'B-TS1', 'B-TS2','B-TS', 'EM1', 'GroupID', 'GroupSize']
@@ -21,11 +21,14 @@ def load(filename=default_filename,dropna=True,verbose=False):
    int_cols = {k:int for k in int_cols}
    dtypes = {**str_cols,**int_cols}
    
-   fill_values = {"EM":0,"Be":0}
+   # fill_values = {"EM":0,"Be":0}
    folderpath =Path(__file__).parent.parent.absolute()
    filepath = folderpath / filename
    df = pd.read_csv(filepath,dtype=dtypes)
-   for column in ["Be","EM"]:
-      df[column] = df[column].fillna(0)
-   df = df.astype({"EM":'int'})
-   return base.preprocess(df,filename,base.twomass_x_columns,y_columns,dropna,verbose=verbose,dtypes=dtypes,fill_values=fill_values)
+   if fillna_classes:
+      for column in y_columns:
+         print(f"Warning: replacing nan in {column} with 0.")
+         df[column] = df[column].fillna(0)
+      df = df.astype({"EM":'int'})
+   
+   return base.preprocess(df,filename,base.twomass_x_columns,y_columns,dropna_x,dropna_y,verbose=verbose,dtypes=dtypes,fill_values=fill_values)

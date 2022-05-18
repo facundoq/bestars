@@ -1,6 +1,6 @@
 from .common import *
 
-class CrossDatasetAccuracy(Experiment):
+class CrossDatasetAccuracy(StarExperiment):
     def description(self) -> str:
         return "Evaluate several training/testing dataset combinations."
     def run(self):

@@ -4,4 +4,7 @@ matplotlib
 jupyter
 seaborn
 numpy
+dexplot
+experimenter
 tensorflow
+tqdm

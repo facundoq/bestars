@@ -16,4 +16,4 @@ default_filename = "Mohr-Smith_2017.csv"
 def load(filename=default_filename,dropna=True,verbose=False):
     y_columns = ["goodOB","EM","SUB","LUM"]
 
-    return base.load(filename,base.twomass_x_columns,y_columns,dropna,verbose=verbose)
+    return base.load(filename,base.twomass_x_columns,y_columns,dropna,dropna,verbose=verbose)

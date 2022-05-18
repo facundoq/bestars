@@ -28,7 +28,7 @@ class KBestScores:
                 self.values.append(value)
 
 
-class BinaryFeatureSelection(Experiment):
+class BinaryFeatureSelection(StarExperiment):
     def description(self) -> str:
         return "Select pairs of features that are good for classifying EM vs no EM objects."
 
@@ -55,7 +55,7 @@ class BinaryFeatureSelection(Experiment):
                                columns=paired_column_names)
             output_df = pd.concat([output_df, qdf], axis=0, ignore_index=True)
         output_df.sort_values(by="f1", ascending=False, inplace=True)
-        output_df.to_csv(self.plot_folderpath /
+        output_df.to_csv(self.folderpath /
                          f"accuracies_{dataset_name}_{feature}.csv")
         k = len(kbest.scores)
 
@@ -74,9 +74,8 @@ class BinaryFeatureSelection(Experiment):
             axes[i].set_ylabel(ylabel, fontsize=5)
             axes[i].set_title(f"F = {score:.2f}", fontsize=7)
             axes[i].tick_params(axis='both', which='major', labelsize=5)
-
-        plt.savefig(self.plot_folderpath /
-                    f"best_{dataset_name}_{feature}.png")
+        self.save_close_fig(f"best_{dataset_name}_{feature}.png")
+        
 
     def run(self):
         dataset_name = "all_em"

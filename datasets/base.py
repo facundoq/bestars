@@ -32,7 +32,7 @@ systems =        {'umag': 'VPHAS',
                   'W2mag':'WISE',
                   }
 
-def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],dropna:bool,verbose=False,dtypes={},fill_values=None,):
+def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],dropna_x:bool=True,dropna_y:bool=False,verbose=False,dtypes={},fill_values=None,):
     if not fill_values is None:
         for column,value in fill_values.items():
             if verbose:
@@ -45,12 +45,15 @@ def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],
     metadata_columns = list(set(df.columns).difference(set(x_columns).union(set(y_columns))))
     metadata = df[metadata_columns].copy()
 
-    if dropna:
+    if dropna_x or dropna_y:
         n = len(x)
-
-        nan_indices_x = np.where(pd.isnull(x).any(axis=1))
-        nan_indices_y = np.where(pd.isnull(y).any(axis=1))
-        nan_indices = np.union1d(nan_indices_x,nan_indices_y)
+        nan_indices = np.zeros(0)
+        if dropna_x:
+            nan_indices_x = np.where(pd.isnull(x).any(axis=1))
+            nan_indices = np.union1d(nan_indices,nan_indices_x)
+        if dropna_y:
+            nan_indices_y = np.where(pd.isnull(y).any(axis=1))
+            nan_indices = np.union1d(nan_indices,nan_indices_y)
         
         x.drop(nan_indices,inplace=True)
         y.drop(nan_indices,inplace=True)

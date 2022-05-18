@@ -16,4 +16,4 @@ default_filename = "Liu2019_LAMOST_OBstars-IPHAS-SDSS-2MASS_subset.csv"
 
 def load(filename=default_filename,dropna=True,verbose=False):
     y_columns = ["Halpha"]
-    return base.load(filename,base.twomass_x_columns,y_columns,dropna,verbose=verbose)
+    return base.load(filename,base.twomass_x_columns,y_columns,dropna,dropna,verbose=verbose)
