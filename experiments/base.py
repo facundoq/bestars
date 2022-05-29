@@ -19,10 +19,10 @@ folderpath = current.parent / "../plots/"
 import abc
 class Feature(abc.ABC):
     @abc.abstractmethod
-    def calculate(self,x:pd.DataFrame,dataset_name:str):
+    def calculate(self,x:pd.DataFrame,dataset_name:str)->pd.DataFrame:
         pass
 class Magnitude(Feature):
-    def calculate(self, x: pd.DataFrame, dataset_name: str):
+    def calculate(self, x: pd.DataFrame, dataset_name: str)->pd.DataFrame:
         return x
     def __repr__(self) -> str:
         return "mag"
@@ -36,7 +36,7 @@ class QFeature(Feature):
         by_system = '(bysystem)' if self.by_system else ''
         return f"q{self.q}{by_system}"
 
-    def calculate(self, x: pd.DataFrame, dataset_name: str):
+    def calculate(self, x: pd.DataFrame, dataset_name: str)->pd.DataFrame:
         dataset_module = datasets.datasets_by_name_all[dataset_name]
         coefficients = dataset_module.coefficients
         systems = dataset_module.systems     

@@ -149,7 +149,7 @@ class FeatureDistributions(StarExperiment):
     def run(self):
         dataset_names = ["aidelman"]
      
-        class_features = {"EM","Be","Type"}
+        class_features = ["Type","EM","Be"]
 
         features = [Magnitude(),QFeature(3,True),QFeature(4,True)]
         for dataset_name in dataset_names:
@@ -159,8 +159,9 @@ class FeatureDistributions(StarExperiment):
 
             y[y==1.0]="Yes"
             y[y==0.0]="No"
-            y.fillna("Missing",inplace=True)
+            
             y = pd.concat([y,metadata],axis=1)
+            y.fillna("Missing",inplace=True)
 
             for feature in features:
                 print(f"{dataset_name}_{feature}")
@@ -176,11 +177,12 @@ class FeatureDistributions(StarExperiment):
     def plot_by_variable(self,x,y,dataset_name,class_features,feature_id):
         for i,class_feature_name in enumerate(class_features):
             values = y[class_feature_name].unique()
-            # print(values)
+            
+            print(class_feature_name,values)
             values.sort()
             n_values = len(values)
             
-            f,axes = plt.subplots(1,n_values,figsize=(n_values*10,1*10),sharey=True,squeeze=False)
+            f,axes = plt.subplots(1,n_values,figsize=(n_values*10,1*10),sharey=True,squeeze=False,dpi=50)
             
             for i,value in enumerate(values):
                 ax=axes[0,i]
@@ -191,7 +193,7 @@ class FeatureDistributions(StarExperiment):
                 ax.set_xticklabels(labels)
 
             plt.suptitle(class_feature_name)
-            self.save_close_fig(f"{dataset_name}_{class_feature_name}_{feature_id}")
+            self.save_close_fig(f"{dataset_name}_{class_feature_name}_{feature_id}.pdf")
 
 class ReducedQ(StarExperiment):
     def description(self) -> str:
@@ -228,6 +230,46 @@ class ReducedQ(StarExperiment):
             plt.title(f"Invertible: {invertible}, condition number: {condition_number}\n{subset_combinations_str}")
 
             self.save_close_fig(f"q{q}_n{n_features}{invertible_str}_reduced{i:03}")
+
+def plot_corr(df,size=10):
+    """Function plots a graphical correlation matrix for each pair of columns in the dataframe.
+
+    Input:
+        df: pandas DataFrame
+        size: vertical and horizontal size of the plot
+    """
+
+    corr = df.corr()
+    fig, ax = plt.subplots(figsize=(size, size))
+    ax.matshow(corr)
+    plt.xticks(range(len(corr.columns)), corr.columns)
+    plt.yticks(range(len(corr.columns)), corr.columns)
+
+class CorrelationMatrix(StarExperiment):
+    def description(self) -> str:
+        return "Plot and store the correlation matrix for all feature types"
+
+    def run(self):
+        dataset_names = ["aidelman"]
+        
+        
+        features = [Magnitude(),QFeature(3,True),QFeature(4,True)]
+        for dataset_name in dataset_names:
+            dataset_module = datasets.datasets_by_name[dataset_name]
+            x,_,_ = dataset_module.load(fillna_classes=False)
+
+            for feature in features:
+                print(f"{dataset_name}_{feature}")
+                x_feature = feature.calculate(x,dataset_name)
+                correlation_matrix = x_feature.corr()
+                del x_feature
+                correlation_matrix.to_pickle(self.folderpath / f"{dataset_name}_{feature}.pkl")
+                plot_corr(correlation_matrix)
+                self.save_close_fig(f"{dataset_name}_{feature}_correlation")
+                
+
+                
+
 
 class FeatureCorrelations(StarExperiment):
     def description(self) -> str:
