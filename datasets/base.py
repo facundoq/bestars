@@ -4,33 +4,46 @@ import numpy as np
 from pathlib import Path
 import pandas as pd
 
-twomass_x_columns = [ 'umag', 'gmag', 'rmag',
-                      'imag', 'Hamag', 'Jmag', 'Hmag', 'Kmag']
-allwise_x_columns = twomass_x_columns + ["W1mag","W2mag"]
+twomass_x_columns = [ 'u', 'g', 'r',
+                      'i', 'Ha', 'J', 'H', 'K']
+allwise_x_columns = twomass_x_columns + ["W1","W2"]
 
 
-coefficients = {'umag': 4.39,
-                'gmag':  3.30,
-                'rmag':  2.31,
-                'imag':  1.71,
-                'Hamag': 2.14,  # valor interpolado
-                'Jmag':  0.72,
-                'Hmag':  0.46,
-                'Kmag':  0.306,
-                'W1mag': 0.18,
-                'W2mag': 0.16}
+coefficients = {'u': 4.39,
+                'g':  3.30,
+                'r':  2.31,
+                'i':  1.71,
+                'Ha': 2.14,  # valor interpolado
+                'J':  0.72,
+                'H':  0.46,
+                'K':  0.306,
+                'W1': 0.18,
+                'W2': 0.16}
 
-systems =        {'umag': 'VPHAS',
-                  'gmag': 'VPHAS',
-                  'rmag': 'VPHAS',
-                  'imag': 'VPHAS',
-                  'Hamag':'VPHAS',
-                  'Jmag': '2MASS',
-                  'Hmag': '2MASS',
-                  'Kmag': '2MASS',
-                  'W1mag':'WISE',
-                  'W2mag':'WISE',
+systems =        {'u': 'VPHAS',
+                  'g': 'VPHAS',
+                  'r': 'VPHAS',
+                  'i': 'VPHAS',
+                  'Ha':'VPHAS',
+                  'J': '2MASS',
+                  'H': '2MASS',
+                  'K': '2MASS',
+                  'W1':'WISE',
+                  'W2':'WISE',
                   }
+
+rename_columns = {"rmag":"r",
+                    "imag":"i",
+                    "gmag":"g",
+                    "umag":"u",
+                    "Hamag":"Ha",
+                    "Hmag":"H",
+                    "Jmag":"J",
+                    "Kmag":"K",
+                    "W1mag":"W1",
+                    "W2mag":"W2",
+                    }
+  
 
 def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],dropna_x:bool=True,dropna_y:bool=False,verbose=False,dtypes={},fill_values=None,):
     if not fill_values is None:
@@ -38,7 +51,7 @@ def preprocess(df:pd.DataFrame,filename,x_columns:List[str],y_columns:List[str],
             if verbose:
                 print(f"Warning: Filling missing values for {column} with {value}")
             df[column] = df[column].fillna(value)
-
+    df = df.rename(columns=rename_columns)
     y = df[y_columns].copy()
     x = df[x_columns].copy()
 

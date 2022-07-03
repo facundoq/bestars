@@ -13,8 +13,10 @@ logging.basicConfig(
 
 from experiments.cross_dataset import CrossDatasetAccuracy
 from experiments.feature_selection import BinaryFeatureSelection
-from experiments.statistics import ClassFeaturesDistribution,ClassDistributionComparison, CategoricalFeaturesDistribution, FeatureDistributions,OutlierDetectionTukey,OutlierDetectionNormalConfidenceInterval,MissingValues,FeatureCorrelations,ReducedQ, CorrelationMatrix
+from experiments.outliers import OutlierDetectionTukey,OutlierDetectionNormalConfidenceInterval
+from experiments.statistics import ClassFeaturesDistribution,ClassDistributionComparison, CategoricalFeaturesDistribution, FeatureDistributions,MissingValues, CorrelationMatrix
 from experiments.evaluate import EvaluateClassifiers,DetermineMinimumTrainingSet
+from experiments.qfeatures import ReducedQ, DataReducedQ
 
 # jupyter nbconvert --to pdf --execute "Exploratory analysis.ipynb" --output "all_em.pdf"
 from experimenter import Experiment
@@ -26,10 +28,10 @@ if __name__ == '__main__':
                    ClassDistributionComparison(),
                    ClassFeaturesDistribution(),
                    MissingValues(),
-                   FeatureCorrelations(),
                    CategoricalFeaturesDistribution(),
                    FeatureDistributions(),
                    ReducedQ(),
+                   DataReducedQ(),
                    CorrelationMatrix(),
                     #BinaryFeatureSelection(),
                 #    OutlierDetectionTukey(),

@@ -1,9 +1,11 @@
 import itertools
 from pathlib import Path
 
+from experiments.base import ColorFeatures, SubsetFeature, UnionFeature
+
 
 from .common import *
-import abc
+
 from scipy import stats
 
 def load_aidelman_raw():
@@ -52,7 +54,7 @@ class ClassFeaturesDistribution(StarExperiment):
             x,y,metadata = dataset_module.load()
             for i,(class_feature_name,class_feature_function) in enumerate(class_features.items()):
                 y_feature = class_feature_function(y,dataset_name)            
-                ax = axes[i]
+                ax = axes[0,i]
                 # y_feature.hist(ax=ax)
                 sn.countplot(x=class_feature_name,ax=ax,data=y_feature)
                 for container in ax.containers:
@@ -67,52 +69,40 @@ class CategoricalFeaturesDistribution(StarExperiment):
 
     def run(self):
         dataset_name = "aidelman"
-        features = ["EM","Be","objtype","class","type"]
+        features = ["EM","Be","objtype","class","Type","EMobj"]
 
         df = load_aidelman_raw()
         df = df.astype("string")
         df = df[features]
-
-        # print(df)
-        # print(df["EM"].dtype)
-        df.fillna("?",inplace=True)
-
-        # df.plot(kind='pie', subplots=True,
-        #  autopct='%1.1f%%', startangle=270,# fontsize=17,figsize=(10,10)
-        #   )
-        colors = sn.color_palette(palette="pastel")
-        n_features = len(features)
-        f,axes=plt.subplots(1,n_features,squeeze=False,dpi=250)
-
+        df.replace( [1.0,1,0.0,0],["Yes","Yes","No","No"],inplace=True)
+        df.fillna("Missing",inplace=True)
+        colors = sn.color_palette(palette=None)#"pastel")
+        min_percentage=0.0001
+        max_values = 7
         for i,feature_name in enumerate(features):
-            ax = axes[0,i]
-            counts=df[feature_name].value_counts(ascending=True,dropna=False)
+            f,axes=plt.subplots(1,1,squeeze=False,dpi=250)
+            ax = axes[0,0]
+            feature = df[feature_name].copy()
+            feature[feature==1]="Yes"
+            feature[feature==0]="No"
+            feature[feature==1.0]="Yes"
+            feature[feature==0.0]="No"
+            counts=feature.value_counts(ascending=False,dropna=False,normalize=True)
+            i = 0
+            for v,c in zip(counts.index,counts.values):
+                i+=1
+                if c<min_percentage or i>max_values:
+                    # print(f"removing {v} ({c},{i})")
+                    feature.iloc[feature==v]="Other"
+            value_counts = feature.value_counts(normalize=True,dropna=False)
+            labels = [f"{l}: {v*100:.2f}%" for l,v in zip(value_counts.index,value_counts.values)]
 
-            labels = counts.index.to_list()
-            values = counts.to_numpy()
-            values = values/values.sum()
-            threshold=0.05
-            indices = values>threshold
-            others = sum(values[values<threshold])
-            values = values[indices]
-            indices =np.where(indices).tolist()
-            print(indices)
-            labels = [ labels[i] for i in indices]
-            labels.append("Others")
-            values = np.append(values,others)
-            
-            labels = [f"{l}: {v*100:.1f}" for l,v in zip(labels,values)]
-
-            patches,texts = ax.pie(values, colors = colors, startangle=90)
+            patches,texts = ax.pie(value_counts.values, colors = colors, startangle=90)
             ax.set_title(feature_name)
-            plt.legend(patches,labels,ncol=4,loc="best",fontsize=5)
+            legend = plt.legend(patches,labels,ncol=4,loc="lower center",fontsize=8)
             # ax.legend(fontsize=7, title_fontsize=10)
-            # df.plot.pie(y=feature_name,ax=ax)
-            # ax.set_xlabel(class_feature_name)
-            # ax.set_ylabel("Samples")
-            
 
-        self.save_close_fig(f"{dataset_name}_distribution")
+            self.save_close_fig(f"{dataset_name}_{feature_name}_distribution",extra_artists=[legend])
 
 
 
@@ -142,94 +132,89 @@ class MissingValues(StarExperiment):
         plt.title(f"Features with missing values. \nDataset with {n} samples and {m} features")
         self.save_close_fig(f"{dataset_name}_missing")
 
+
+
 class FeatureDistributions(StarExperiment):
     def description(self) -> str:
-        return "Plot histograms of distribution of features, also divided by class, for each dataset"
+        return "Plot boxplots of distribution of features, also divided by class, for each dataset"
 
     def run(self):
         dataset_names = ["aidelman"]
-     
-        class_features = ["Type","EM","Be"]
-
-        features = [Magnitude(),QFeature(3,True),QFeature(4,True)]
+        em_name = "EM"
+        b_name = "Tipo espectral B"
+        em_old_name = "EM(old)"
+        class_features = ["Type","EM","Be",b_name,em_name]
+        standard_colors = ColorFeatures([("u","g"), ("r","i"), ("r", "Ha")])
+        magnitudes_colors = UnionFeature([Magnitude(),standard_colors])
+        q3_system = QFeature(3,True)
+        q4 = QFeature(4,True)
+        q4_poster = QFeature(4,False,["u","g","r","i","Ha"])
+        q4_poster_subset = SubsetFeature(q4_poster,["ugri","ugrHa"])
+        poster = UnionFeature([Magnitude(),standard_colors,q4_poster_subset])
+        features = [ Magnitude(),#q3,q4,
+                     standard_colors,
+                     q4_poster_subset,
+                     q3_system,
+                     poster
+                    ]
+                    
         for dataset_name in dataset_names:
             dataset_module = datasets.datasets_by_name[dataset_name]
             
             x,y,metadata = dataset_module.load(fillna_classes=False)
-
-            y[y==1.0]="Yes"
-            y[y==0.0]="No"
-            
             y = pd.concat([y,metadata],axis=1)
-            y.fillna("Missing",inplace=True)
+
+            y.rename(columns={"B-TS":b_name},inplace=True)
+            y.rename(columns={"EM":em_old_name},inplace=True)
+            y.rename(columns={"EMobj":em_name},inplace=True)
+            
+
+            yes = "Si"
+            no = "No"
+            y.replace( [1.0,1,"1",0.0,0,"0"],[yes,yes,yes,no,no,no],inplace=True)
+            
+            y.fillna("Faltante",inplace=True)
+            
 
             for feature in features:
                 print(f"{dataset_name}_{feature}")
                 x_feature = feature.calculate(x,dataset_name)
-
                 plt.figure(figsize=(10,10))
                 sn.boxplot(data=x_feature)
                 self.save_close_fig(f"{dataset_name}_distribution")
-
-                self.plot_by_variable(x_feature,y,dataset_name,class_features,feature)
+                self.plot_by_class_feature(x_feature,y,dataset_name,class_features,feature)
                 del x_feature
+    def filter_values_by_count(self,class_feature:pd.DataFrame,max_values:int):
+        value_counts = class_feature.value_counts(normalize=True,sort=True)
+        n_values = len(value_counts)
+        if max_values<n_values:
+            remaining_values = value_counts.iloc[max_values:]
+            for i,v in zip(remaining_values.index,remaining_values.values):
+                class_feature[class_feature==i]="Other"
+        return class_feature
 
-    def plot_by_variable(self,x,y,dataset_name,class_features,feature_id):
+    def plot_by_class_feature(self,x:pd.DataFrame,y:pd.DataFrame,dataset_name:str,class_features:List[str],feature:Feature,max_values=4):
         for i,class_feature_name in enumerate(class_features):
-            values = y[class_feature_name].unique()
-            
-            print(class_feature_name,values)
-            values.sort()
-            n_values = len(values)
-            
+            class_feature = y[class_feature_name].copy()
+            class_feature = self.filter_values_by_count(class_feature,max_values=max_values)
+            value_counts = class_feature.value_counts(normalize=True,sort=True)
+            n_values = len(value_counts)
             f,axes = plt.subplots(1,n_values,figsize=(n_values*10,1*10),sharey=True,squeeze=False,dpi=50)
-            
-            for i,value in enumerate(values):
+            # Sort by name
+            names,values = value_counts.index,value_counts.values
+            indices = np.argsort(names)
+            names = names[indices]
+            values = values[indices]
+            for i,(name,value) in enumerate(zip(names,values)):
                 ax=axes[0,i]
-                x_value = x.loc[y[class_feature_name]==value]
-                ax.set_title(value)
+                x_value = x.loc[class_feature==name]
+                ax.set_title(f"{name} ({value*100:.1f}%)",fontsize=24)
                 ax = sn.boxplot(data=x_value,ax=ax)
-                labels = [l.get_text().replace("mag","") for l in ax.get_xticklabels()]
-                ax.set_xticklabels(labels)
+                ax.tick_params(axis='both', which='major', labelsize=18)
 
-            plt.suptitle(class_feature_name)
-            self.save_close_fig(f"{dataset_name}_{class_feature_name}_{feature_id}.pdf")
 
-class ReducedQ(StarExperiment):
-    def description(self) -> str:
-        return "Find reduced structure in Q features with blocks"
-
-    def run(self):
-        
-        def generate_combination_matrix(n_features,n_magnitudes):
-            combination_matrix = np.zeros(n_features,n_magnitudes)
-            for i,c in enumerate(itertools.combinations(n_features,n_magnitudes)):
-                combination_matrix[i,c]=1
-            return combination_matrix
-
-        n_features = 5
-        q = 3
-        features = list(range(n_features))
-        full_combinations = list(itertools.combinations(features,3))
-        full_combination_matrix = generate_combination_matrix(full_combinations,n_features)
-        
-    def analyze_matrix(self,matrix:np.ndarray):
-        n_features,n = matrix.shape
-        epsilon = np.finfo(matrix.dtype).eps
-        print(epsilon)
-        sn.heatmap(matrix)
-        self.save_close_fig(f"q{q}_n{n_features}_full")
-        subsets_combinations = list(itertools.combinations(n_features,n_features))
-        for i,subset_combinations in enumerate(subsets_combinations):
-            subset_combination_matrix = generate_combination_matrix(subset_combinations,n_features)
-            condition_number = np.linalg.cond(subset_combination_matrix)
-            invertible = condition_number<1/epsilon
-            invertible_str = "_sin" if not invertible else "_inv"
-            sn.heatmap(subset_combination_matrix)
-            subset_combinations_str = ",".join([str(s) for s in subset_combinations])
-            plt.title(f"Invertible: {invertible}, condition number: {condition_number}\n{subset_combinations_str}")
-
-            self.save_close_fig(f"q{q}_n{n_features}{invertible_str}_reduced{i:03}")
+            plt.suptitle(class_feature_name,fontsize=36)
+            self.save_close_fig(f"{dataset_name}_{class_feature_name}_{feature}.png")
 
 def plot_corr(df,size=10):
     """Function plots a graphical correlation matrix for each pair of columns in the dataframe.
@@ -271,102 +256,26 @@ class CorrelationMatrix(StarExperiment):
                 
 
 
-class FeatureCorrelations(StarExperiment):
-    def description(self) -> str:
-        return "Plot histograms of distribution of classes for each dataset"
+# class FeatureCorrelations(StarExperiment):
+#     def description(self) -> str:
+#         return "Plot histograms of distribution of classes for each dataset"
 
-    def run(self):
-        dataset_names = ["aidelman"]
+#     def run(self):
+#         dataset_names = ["aidelman"]
         
         
-        for dataset_name in dataset_names:
-            dataset_module = datasets.datasets_by_name[dataset_name]
-            x,y,metadata = dataset_module.load()
-            n_class_features = len(class_features)
-            f,axes=plt.subplots(1,n_class_features,sharey=True,sharex=True)
-            for i,(class_feature_name,class_feature_function) in enumerate(class_features.items()):
-                x,y,metadata = dataset_module.load()
-                y = class_feature_function(y,dataset_name)            
-                ax = axes[i]
-                y.hist(ax=ax)
-                ax.set_xlabel(class_feature_name)
-                if i==0:
-                    ax.set_ylabel("Samples")
-            self.save_close_fig(f"{dataset_name}_distribution")
+#         for dataset_name in dataset_names:
+#             dataset_module = datasets.datasets_by_name[dataset_name]
+#             x,y,metadata = dataset_module.load()
+#             n_class_features = len(class_features)
+#             f,axes=plt.subplots(1,n_class_features,sharey=True,sharex=True)
+#             for i,(class_feature_name,class_feature_function) in enumerate(class_features.items()):
+#                 x,y,metadata = dataset_module.load()
+#                 y = class_feature_function(y,dataset_name)            
+#                 ax = axes[i]
+#                 y.hist(ax=ax)
+#                 ax.set_xlabel(class_feature_name)
+#                 if i==0:
+#                     ax.set_ylabel("Samples")
+#             self.save_close_fig(f"{dataset_name}_distribution")
 
-class OutlierDetection(StarExperiment):
-
-    @abc.abstractmethod
-    def detect_outliers(self,x:pd.DataFrame):
-        pass
-
-    def get_outliers_column(self,x:pd.DataFrame,outliers:pd.DataFrame):
-        outlier_columns = []
-        for row_i, row in outliers.iterrows():
-            column_indices = np.where(row)[0]
-            if len(column_indices) > 0:
-                column_names = x.columns[column_indices].values
-                column_names_str = " | ".join(column_names)
-                outlier_columns.append(column_names_str)
-
-        return outlier_columns
-
-    def run_inner(self, x, y, metadata, name:str):
-        outliers = self.detect_outliers(x)
-        outlier_indices = outliers.any(axis=1)
-        outliers_x = x[outlier_indices].copy()
-
-        outlier_columns = self.get_outliers_column(x, outliers)
-        outliers_x["outlier_columns"] = outlier_columns
-
-        outliers_metadata = metadata[outlier_indices]
-        outliers_x = pd.concat([outliers_x, outliers_metadata], axis=1)
-        outliers_y = y[outlier_indices]
-        outliers_x = pd.concat([outliers_x, outliers_y], axis=1)
-        return outliers_x,outlier_indices
-
-    def run(self):
-        names = datasets.datasets_by_name_all
-        for i,(name,dataset_module) in enumerate(names.items()):
-            x,y,metadata = dataset_module.load(dropna=True)
-            outliers,outlier_indices = self.run_inner(x, y, metadata, name)
-            outliers.to_csv(self.folderpath / f"{name}.csv")
-            
-            coefficients = dataset_module.coefficients
-            systems = dataset_module.systems
-            coefficients_np = np.array([coefficients[k] for k in x.columns])
-            systems = [systems[k] for k in x.columns]
-            for combination_size in [3,4]:
-                q_np = qfeatures.calculate(x.to_numpy(), coefficients_np, x.columns, systems, combination_size=combination_size,by_system=True)
-                q = pd.DataFrame(q_np.magnitudes, columns=q_np.column_names)
-                outliers,outlier_indices = self.run_inner(q, y, metadata, name)
-                outliers = pd.concat([x[outlier_indices],outliers],axis=1)
-                outliers.to_csv(self.folderpath / f"{name}_q{combination_size}.csv")
-
-
-
-
-
-
-class OutlierDetectionTukey(OutlierDetection):
-    def description(self) -> str:
-        return "Detect outliers in each dataset using IQR based statistics"
-    def detect_outliers(self,x:pd.DataFrame):
-        out = outliers.detect_outliers_iqr(x,iqr_factor=3)
-        return pd.DataFrame(out)
-
-
-class OutlierDetectionNormalConfidenceInterval(OutlierDetection):
-    def description(self) -> str:
-        return "Detect outliers in each dataset using a Confidence interval based statistics"
-
-    def detect_outliers(self,x:pd.DataFrame):
-        # m = len(x.columns)  # number of columns = number of hypothesis
-        # confidence = 0.99
-        # adjusted_confidence = 1 - (1 - confidence) / m  # bonferroni-adjusted confidence
-        # max_zscore = stats.norm.ppf(adjusted_confidence)
-
-        # outliers = np.abs(stats.zscore(x - x.mean())) > max_zscore
-        # return pd.DataFrame(outliers,columns=x.columns)
-        out = outliers.detect_outliers_confidence_interval(x,confidence=0.999)
-        return pd.DataFrame(out)

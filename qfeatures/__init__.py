@@ -1,1 +1,2 @@
 from .qfeatures import calculate,calculate_df
+from .qfeatures import q_matrix_full,q_matrix_from_combinations,q_matrix_sequential,q_matrix_sequential_steps,q_matrix_all_magnitudes

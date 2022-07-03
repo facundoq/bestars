@@ -25,6 +25,8 @@ def load(filename=default_filename,dropna_x=True,dropna_y=False,fillna_classes=T
    folderpath =Path(__file__).parent.parent.absolute()
    filepath = folderpath / filename
    df = pd.read_csv(filepath,dtype=dtypes)
+
+
    if fillna_classes:
       for column in y_columns:
          print(f"Warning: replacing nan in {column} with 0.")

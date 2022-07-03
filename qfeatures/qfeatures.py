@@ -1,11 +1,12 @@
 from __future__ import annotations
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import numpy as np
 import itertools
 
 
 def q_row(c:np.ndarray,indices:np.ndarray):
-    row = np.array(len(coefficients))
+    n = len(indices)
+    row = np.zeros(len(c))
     if n==3:
         i,j,k=indices
         r =  (c[i]-c[j])/(c[j]-c[k])
@@ -23,19 +24,42 @@ def q_row(c:np.ndarray,indices:np.ndarray):
         raise ValueError(f"Wrong number of indices, expected 3 or 4, received {n}.")
     return row
 
-def q_matrix(coefficients:np.ndarray,permutations:False,q=3):
+def q_matrix_full(coefficients:np.ndarray,permutations=False,q=3):
     assert q==3 or q==4, "The order of q must be 3 or 4"
     n = len(coefficients)
    
-    combinations = itertools.permutations(n,q) if permutations else itertools.combinations(n,q)
+    combinations = itertools.permutations(range(n),q) if permutations else itertools.combinations(range(n),q)
     combinations = list(combinations)
+    return q_matrix_from_combinations(coefficients,combinations),combinations
+
+def q_matrix_from_combinations(coefficients:np.ndarray,combinations:List[Tuple]):
+    n = len(coefficients)
     q = np.zeros((len(combinations),n))
     for i,combination in enumerate(combinations):
         q[i,:]=q_row(coefficients,combination)
-    return q,combinations
+    return q
 
+def crange(start, end,modulo,step=1):
+    for i in range(start,end):
+        yield i % modulo
 
+def q_matrix_sequential(coefficients:np.ndarray,q=3,step=1):
+    assert q==3 or q==4, "The order of q must be 3 or 4"
+    n = len(coefficients)
+    combinations = [ tuple(crange(i,i+q,n,step=step)) for i in range(n)]
+    return q_matrix_from_combinations(coefficients,combinations),combinations
 
+def q_matrix_sequential_steps(coefficients:np.ndarray,q=3):
+    assert q==3 or q==4, "The order of q must be 3 or 4"
+    n = len(coefficients)
+    combinations = [ tuple(crange(i,i+q,n,step=s)) for i in range(n) for s in range(1,n)]
+    return q_matrix_from_combinations(coefficients,combinations),combinations
+
+def q_matrix_all_magnitudes(coefficients:np.ndarray,q=3,step=1):
+    assert q==3 or q==4, "The order of q must be 3 or 4"
+    n = len(coefficients)
+    combinations = [ tuple(crange(i,i+q,n,step=step)) for i in range(n)]
+    return q_matrix_from_combinations(coefficients,combinations),combinations
 
 class Magnitudes:
     @staticmethod
@@ -111,7 +135,7 @@ def calculate_q(m:Magnitudes,combination_size:int):
     n,n_cols=m.magnitudes.shape
     index_combinations = m.get_combinations(combination_size)
     qfunction = get_qfunction(combination_size,m.coefficients)
-    q_names = [ "_".join([m.column_names[i] for i in combination]) for combination in index_combinations]
+    q_names = [ "".join([m.column_names[i] for i in combination]) for combination in index_combinations]
     q_systems = ["_".join(set([m.systems[i] for i in combination])) for combination in index_combinations]
     n_qindices= len(index_combinations)
     q_magnitudes = np.zeros((n,n_qindices))
